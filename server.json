@@ -47,7 +47,6 @@
     {
       "registryType": "oci",
       "identifier": "ghcr.io/shakerg/model-mcp:1.0.1",
-      "version": "1.0.1",
       "runtimeHint": "docker",
       "transport": {
         "type": "stdio"
