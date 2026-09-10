@@ -12,7 +12,7 @@ The server does not proxy prompts or model completions. It advertises where loca
 
 ## Install
 
-The package is published on npm as [`model-mcp`](https://www.npmjs.com/package/model-mcp). This is a local stdio server, so Node.js 20 or newer must be installed on the machine running GitHub Copilot.
+Published releases are available on npm as [`model-mcp`](https://www.npmjs.com/package/model-mcp). Confirm the version you want with `npm view model-mcp version` before configuring it. This is a local stdio server, so Node.js 20 or newer must be installed on the machine running GitHub Copilot.
 
 ### Run from a source checkout
 
@@ -41,7 +41,7 @@ You can also run the checkout directly with `npm start`; it communicates over st
 
 ### Install from npm
 
-In the GitHub Copilot app, add a **local/stdio** MCP server and let `npx` download and launch it:
+If `npm view model-mcp version` returns the release you want, add a **local/stdio** MCP server in the GitHub Copilot app and let `npx` download and launch it:
 
 ```json
 {
