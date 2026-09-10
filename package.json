@@ -1,0 +1,40 @@
+{
+  "name": "model-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for discovering and describing local model runtimes",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://localhost:26831/shakerg/model-mcp"
+  },
+  "keywords": [
+    "mcp",
+    "models",
+    "copilot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "model-mcp": "dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "typescript": "^7.0.2"
+  }
+}
