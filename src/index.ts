@@ -4,7 +4,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod/v4';
 
-const SERVER_VERSION = '1.0.0';
+const SERVER_VERSION = '1.0.1';
 const REQUEST_TIMEOUT_MS = Number.parseInt(process.env.MODEL_MCP_TIMEOUT_MS ?? '2000', 10);
 const ALLOW_REMOTE = process.env.MODEL_MCP_ALLOW_REMOTE === 'true';
 

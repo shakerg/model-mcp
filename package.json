@@ -1,6 +1,7 @@
 {
   "name": "model-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "mcpName": "io.github.shakerg/model-mcp",
   "description": "MCP server for discovering and describing local model runtimes",
   "main": "dist/index.js",
   "scripts": {

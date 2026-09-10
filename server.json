@@ -3,7 +3,7 @@
   "name": "io.github.shakerg/model-mcp",
   "title": "Local Model Discovery",
   "description": "Discovers models exposed by local Ollama, LM Studio, and OpenAI-compatible runtimes.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://github.com/shakerg/model-mcp",
   "repository": {
     "url": "https://github.com/shakerg/model-mcp",
@@ -14,7 +14,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "model-mcp",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "transport": {
         "type": "stdio"
       },
@@ -22,6 +22,7 @@
         {
           "name": "MODEL_MCP_ENDPOINTS",
           "description": "Comma-separated local model endpoint base URLs.",
+          "placeholder": "http://127.0.0.1:11434,http://127.0.0.1:1234",
           "isRequired": false,
           "isSecret": false
         },
