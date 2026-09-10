@@ -75,7 +75,7 @@ try {
     command: installedCommand,
     stderr: 'pipe'
   });
-  const client = new Client({ name: 'model-mcp-package-smoke-test', version: '1.0.0' });
+  const client = new Client({ name: 'model-mcp-package-smoke-test', version: packageJson.version });
 
   try {
     await withTimeout(client.connect(transport), 'packed server did not complete MCP initialization within 10 seconds');

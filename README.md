@@ -49,7 +49,7 @@ Once a maintainer has published this package and `npm view model-mcp` returns a 
     "local-models": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "model-mcp@1.0.0"]
+      "args": ["-y", "model-mcp@<published-version>"]
     }
   }
 }
