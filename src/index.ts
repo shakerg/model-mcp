@@ -62,6 +62,10 @@ const defaultEndpoints: Endpoint[] = [
 
 function normalizeBaseUrl(value: string): string {
   const parsed = new URL(value);
+  if (parsed.username || parsed.password) {
+    throw new Error('Endpoint URLs must not include credentials');
+  }
+
   parsed.pathname = parsed.pathname.replace(/\/+$/, '');
   parsed.search = '';
   parsed.hash = '';
@@ -73,10 +77,14 @@ function isLoopbackUrl(value: string): boolean {
   return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.startsWith('127.');
 }
 
-function inferEndpoint(rawUrl: string, index: number): Endpoint {
+function inferEndpoint(rawUrl: string, index: number): Endpoint | undefined {
   const baseUrl = normalizeBaseUrl(rawUrl);
   const lower = baseUrl.toLowerCase();
   const kind: ProviderKind = lower.includes('11434') ? 'ollama' : 'openai-compatible';
+  if (!ALLOW_REMOTE && !isLoopbackUrl(baseUrl)) {
+    return undefined;
+  }
+
   return {
     id: `env-${index + 1}`,
     name: `Configured endpoint ${index + 1}`,
@@ -87,18 +95,29 @@ function inferEndpoint(rawUrl: string, index: number): Endpoint {
   };
 }
 
-function configuredEndpoints(): Endpoint[] {
-  const fromEnvironment = (process.env.MODEL_MCP_ENDPOINTS ?? '')
+function environmentEndpoints(): Endpoint[] {
+  return (process.env.MODEL_MCP_ENDPOINTS ?? '')
     .split(',')
     .map((value) => value.trim())
     .filter(Boolean)
-    .map(inferEndpoint)
-    .filter((endpoint) => ALLOW_REMOTE || isLoopbackUrl(endpoint.baseUrl));
+    .flatMap((rawUrl, index) => {
+      try {
+        const endpoint = inferEndpoint(rawUrl, index);
+        return endpoint ? [endpoint] : [];
+      } catch {
+        return [];
+      }
+    });
+}
 
+function configuredEndpoints(): Endpoint[] {
+  const fromEnvironment = environmentEndpoints();
   const merged = new Map<string, Endpoint>();
   for (const endpoint of [...defaultEndpoints, ...fromEnvironment]) {
     if (ALLOW_REMOTE || isLoopbackUrl(endpoint.baseUrl)) {
-      merged.set(endpoint.baseUrl, endpoint);
+      if (!merged.has(endpoint.baseUrl)) {
+        merged.set(endpoint.baseUrl, endpoint);
+      }
     }
   }
 
@@ -178,14 +197,26 @@ function jsonText(value: unknown) {
 }
 
 function copilotConfiguration() {
+  const modelEndpoints = environmentEndpoints().map((endpoint) => endpoint.baseUrl).join(',');
+  const env = Object.fromEntries(
+    [
+      'MODEL_MCP_TIMEOUT_MS',
+      'MODEL_MCP_ALLOW_REMOTE'
+    ].flatMap((name) => {
+      const value = process.env[name];
+      return value ? [[name, value]] : [];
+    })
+  );
+  if (modelEndpoints) {
+    env.MODEL_MCP_ENDPOINTS = modelEndpoints;
+  }
+
   return {
     mcpServers: {
       'local-models': {
         command: 'npx',
         args: ['-y', 'model-mcp'],
-        env: {
-          MODEL_MCP_ENDPOINTS: 'http://127.0.0.1:11434,http://127.0.0.1:1234,http://127.0.0.1:8080'
-        }
+        ...(Object.keys(env).length > 0 ? { env } : {})
       }
     },
     notes: [

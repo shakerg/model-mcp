@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://localhost:26831/shakerg/model-mcp"
+    "url": "https://github.com/shakerg/model-mcp.git"
   },
   "keywords": [
     "mcp",
