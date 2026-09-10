@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod/v4';
@@ -212,14 +213,16 @@ function copilotConfiguration() {
   }
 
   return {
-    mcpServers: {
+    servers: {
       'local-models': {
-        command: 'npx',
-        args: ['-y', 'model-mcp'],
+        type: 'stdio',
+        command: process.execPath,
+        args: [fileURLToPath(import.meta.url)],
         ...(Object.keys(env).length > 0 ? { env } : {})
       }
     },
     notes: [
+      'This configuration launches the exact installed or locally built server that generated it.',
       'MODEL_MCP_ENDPOINTS is optional; defaults cover Ollama, LM Studio, and LocalAI on common localhost ports.',
       'Set MODEL_MCP_ALLOW_REMOTE=true only if you intentionally want to advertise non-loopback model endpoints.'
     ]

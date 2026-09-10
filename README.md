@@ -12,42 +12,53 @@ The server does not proxy prompts or model completions. It advertises where loca
 
 ## Install
 
+This repository is ready to be packaged as `model-mcp`, but **the package is not currently published to npm**. Until `npm view model-mcp` succeeds, do not configure Copilot with `npx -y model-mcp`.
+
+### Run from a source checkout
+
 ```sh
+git clone https://github.com/shakerg/model-mcp.git
+cd model-mcp
 npm install
 npm run build
 ```
 
-## Run
-
-```sh
-npm start
-```
-
-For MCP clients, run the compiled server over stdio:
+In the GitHub Copilot app, add a **local/stdio** MCP server. Use the absolute path to the checkout:
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "local-models": {
-      "command": "npx",
-      "args": ["-y", "model-mcp"]
-    }
-  }
-}
-```
-
-During local development, point the command at this checkout after building:
-
-```json
-{
-  "mcpServers": {
-    "local-models": {
+      "type": "stdio",
       "command": "node",
       "args": ["/absolute/path/to/model-mcp/dist/index.js"]
     }
   }
 }
 ```
+
+You can also run the checkout directly with `npm start`; it communicates over stdio and normally waits silently for an MCP client.
+
+### Install from npm after publication
+
+Once a maintainer has published this package and `npm view model-mcp` returns a version, Copilot can let `npx` download and launch it:
+
+```json
+{
+  "servers": {
+    "local-models": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "model-mcp@1.0.0"]
+    }
+  }
+}
+```
+
+Use the package's exact published version for reproducible installation.
+
+> [!WARNING]
+> `https://github.com/shakerg/model-mcp` is a repository page, not a remote MCP endpoint. Do not enter it as an HTTP, SSE, or streamable HTTP server URL. This project is a local stdio server; treating the GitHub URL as an MCP endpoint sends protocol requests to a web page and results in HTTP errors such as `422` with an HTML response.
 
 ## Configuration
 
@@ -83,6 +94,17 @@ Optional environment variables:
 ## Development
 
 ```sh
-npm run check
-npm run build
+npm run test:package
 ```
+
+`test:package` type-checks the source, validates `server.json` against its official MCP schema, creates the npm tarball, checks that `dist/index.js` is executable and included, installs the tarball into a clean temporary project, and completes an MCP initialize/list-tools exchange over stdio.
+
+## Publishing checklist
+
+Publication requires maintainer access to npm and is intentionally not performed by this repository:
+
+1. Run `npm run test:package`.
+2. Confirm the version matches in `package.json`, `server.json`, and `src/index.ts`.
+3. Publish with the project owner's npm account or configured trusted publishing.
+4. Confirm `npm view model-mcp version` returns the released version.
+5. Only then publish or submit `server.json` to an MCP registry.
