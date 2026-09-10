@@ -53,10 +53,17 @@ try {
   const packageJson = JSON.parse(await readFile(path.join(packageDirectory, 'package.json'), 'utf8'));
   const serverJson = JSON.parse(await readFile(path.join(packageDirectory, 'server.json'), 'utf8'));
   const binary = path.join(packageDirectory, 'dist', 'index.js');
+  const npmPackage = serverJson.packages.find((entry) => entry.registryType === 'npm');
+  const containerPackage = serverJson.packages.find((entry) => entry.registryType === 'oci');
 
   assert.equal(packageJson.bin['model-mcp'], 'dist/index.js', 'installed package has an incorrect model-mcp bin target');
-  assert.equal(serverJson.packages[0].identifier, packageJson.name, 'server.json npm identifier differs from package name');
-  assert.equal(serverJson.packages[0].version, packageJson.version, 'server.json package version differs from package version');
+  assert.equal(packageJson.mcpName, serverJson.name, 'package mcpName differs from server.json name');
+  assert(npmPackage, 'server.json does not declare an npm package');
+  assert(containerPackage, 'server.json does not declare an OCI package');
+  assert.equal(npmPackage.identifier, packageJson.name, 'server.json npm identifier differs from package name');
+  assert.equal(npmPackage.version, packageJson.version, 'server.json package version differs from package version');
+  assert.equal(containerPackage.version, packageJson.version, 'server.json container version differs from package version');
+  assert(containerPackage.identifier.endsWith(`:${packageJson.version}`), 'container tag differs from package version');
   assert.equal(serverJson.version, packageJson.version, 'server.json server version differs from package version');
   await access(binary, constants.R_OK);
   assert((await readFile(binary, 'utf8')).startsWith('#!/usr/bin/env node\n'), 'dist binary is missing its Node.js shebang');

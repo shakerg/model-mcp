@@ -1,5 +1,8 @@
 # model-mcp
 
+[![npm](https://img.shields.io/npm/v/model-mcp)](https://www.npmjs.com/package/model-mcp)
+[![container](https://img.shields.io/badge/container-ghcr.io-blue)](https://github.com/shakerg/model-mcp/pkgs/container/model-mcp)
+
 `model-mcp` is a Model Context Protocol (MCP) server that discovers local model runtimes and exposes their endpoint metadata to MCP clients such as Copilot.
 
 It checks common localhost endpoints for:
@@ -37,9 +40,9 @@ In the GitHub Copilot app, add a **local/stdio** MCP server. Use the absolute pa
 
 You can also run the checkout directly with `npm start`; it communicates over stdio and normally waits silently for an MCP client.
 
-### Install from npm after publication
+### Install from npm
 
-Once a maintainer has published this package and `npm view model-mcp` returns a version, Copilot can let `npx` download and launch it:
+If `npm view model-mcp version` returns the release you want, add a **local/stdio** MCP server in the GitHub Copilot app and let `npx` download and launch it:
 
 ```json
 {
@@ -55,6 +58,41 @@ Once a maintainer has published this package and `npm view model-mcp` returns a 
 
 Use the package's exact published version for reproducible installation.
 
+### Install from Docker
+
+Images are stored in this repository's [GitHub Container Registry package](https://github.com/shakerg/model-mcp/pkgs/container/model-mcp). After the matching version is available, add a **local/stdio** server that keeps stdin open and maps the cross-platform Docker host name:
+
+```json
+{
+  "servers": {
+    "local-models": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--add-host",
+        "host.docker.internal:host-gateway",
+        "ghcr.io/shakerg/model-mcp:<published-version>"
+      ]
+    }
+  }
+}
+```
+
+The image defaults to the common model ports on `host.docker.internal`, allowing the container to discover Ollama, LM Studio, and LocalAI running on the host. Use `MODEL_MCP_ENDPOINTS` to override those endpoints.
+
+### Install from an MCP registry
+
+After a release is listed in an MCP registry, supported Copilot clients can choose either the npm or Docker package instead of entering the command manually. The installer reads `server.json` and presents these optional environment fields:
+
+- `MODEL_MCP_ENDPOINTS`
+- `MODEL_MCP_TIMEOUT_MS`
+- `MODEL_MCP_ALLOW_REMOTE`
+
+Leave a field unset to use its default. Registry installation is available only after the package or image version referenced by `server.json` has been published.
+
 > [!WARNING]
 > `https://github.com/shakerg/model-mcp` is a repository page, not a remote MCP endpoint. Do not enter it as an HTTP, SSE, or streamable HTTP server URL. This project is a local stdio server; treating the GitHub URL as an MCP endpoint sends protocol requests to a web page and results in HTTP errors such as `422` with an HTML response.
 
@@ -66,7 +104,7 @@ Set `MODEL_MCP_ENDPOINTS` to a comma-separated list of local endpoint base URLs 
 MODEL_MCP_ENDPOINTS="http://127.0.0.1:11434,http://127.0.0.1:1234" npm start
 ```
 
-By default, only loopback hosts are accepted. Set `MODEL_MCP_ALLOW_REMOTE=true` only when you intentionally want to expose non-local model endpoints through the MCP server.
+By default, only loopback hosts and Docker's `host.docker.internal` gateway are accepted. Set `MODEL_MCP_ALLOW_REMOTE=true` only when you intentionally want to expose other model endpoints through the MCP server.
 
 Optional environment variables:
 
@@ -93,16 +131,22 @@ Optional environment variables:
 
 ```sh
 npm run test:package
+npm run test:docker
 ```
 
 `test:package` type-checks the source, validates `server.json` against its official MCP schema, creates the npm tarball, checks that `dist/index.js` is executable and included, installs the tarball into a clean temporary project, and completes an MCP initialize/list-tools exchange over stdio.
 
+`test:docker` builds the production image and completes the same MCP initialize/list-tools exchange through `docker run`.
+
+When Docker-related source changes merge to `main`, the `Publish container` GitHub Actions workflow builds `linux/amd64` and `linux/arm64` images and pushes both the package version and `latest` tags to this repository's GHCR package. The workflow rejects an existing version tag, so image changes require a version bump.
+
 ## Publishing checklist
 
-Publication requires maintainer access to npm and is intentionally not performed by this repository:
+Publication requires maintainer access to npm, GitHub Container Registry, and the MCP registry:
 
 1. Run `npm run test:package`.
-2. Confirm the version matches in `package.json`, `server.json`, and `src/index.ts`.
+2. Confirm the version matches in `package.json`, `server.json`, and `src/index.ts`, and that `package.json#mcpName` matches `server.json#name`.
 3. Publish with the project owner's npm account or configured trusted publishing.
 4. Confirm `npm view model-mcp version` returns the released version.
-5. Only then publish or submit `server.json` to an MCP registry.
+5. Merge the release PR to `main` to publish the multi-platform image, then make the GHCR package public if it does not inherit public visibility and verify its version tag.
+6. Only then publish `server.json` to an MCP registry.

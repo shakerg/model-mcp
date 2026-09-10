@@ -4,7 +4,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod/v4';
 
-const SERVER_VERSION = '1.0.0';
+const SERVER_VERSION = '1.0.1';
 const REQUEST_TIMEOUT_MS = Number.parseInt(process.env.MODEL_MCP_TIMEOUT_MS ?? '2000', 10);
 const ALLOW_REMOTE = process.env.MODEL_MCP_ALLOW_REMOTE === 'true';
 
@@ -73,16 +73,20 @@ function normalizeBaseUrl(value: string): string {
   return parsed.toString().replace(/\/$/, '');
 }
 
-function isLoopbackUrl(value: string): boolean {
+function isLocalUrl(value: string): boolean {
   const hostname = new URL(value).hostname.toLowerCase();
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.startsWith('127.');
+  return hostname === 'localhost'
+    || hostname === 'host.docker.internal'
+    || hostname === '127.0.0.1'
+    || hostname === '::1'
+    || hostname.startsWith('127.');
 }
 
 function inferEndpoint(rawUrl: string, index: number): Endpoint | undefined {
   const baseUrl = normalizeBaseUrl(rawUrl);
   const lower = baseUrl.toLowerCase();
   const kind: ProviderKind = lower.includes('11434') ? 'ollama' : 'openai-compatible';
-  if (!ALLOW_REMOTE && !isLoopbackUrl(baseUrl)) {
+  if (!ALLOW_REMOTE && !isLocalUrl(baseUrl)) {
     return undefined;
   }
 
@@ -115,7 +119,7 @@ function configuredEndpoints(): Endpoint[] {
   const fromEnvironment = environmentEndpoints();
   const merged = new Map<string, Endpoint>();
   for (const endpoint of [...defaultEndpoints, ...fromEnvironment]) {
-    if (ALLOW_REMOTE || isLoopbackUrl(endpoint.baseUrl)) {
+    if (ALLOW_REMOTE || isLocalUrl(endpoint.baseUrl)) {
       if (!merged.has(endpoint.baseUrl)) {
         merged.set(endpoint.baseUrl, endpoint);
       }

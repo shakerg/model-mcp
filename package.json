@@ -1,6 +1,7 @@
 {
   "name": "model-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "mcpName": "io.github.shakerg/model-mcp",
   "description": "MCP server for discovering and describing local model runtimes",
   "main": "dist/index.js",
   "scripts": {
@@ -11,7 +12,8 @@
     "prepare": "npm run build",
     "prepack": "npm run clean && npm run build",
     "validate:manifest": "node scripts/validate-server-json.mjs",
-    "test:package": "npm run check && npm run validate:manifest && node scripts/package-smoke-test.mjs"
+    "test:package": "npm run check && npm run validate:manifest && node scripts/package-smoke-test.mjs",
+    "test:docker": "docker build -t model-mcp:test . && MODEL_MCP_DOCKER_IMAGE=model-mcp:test node scripts/docker-smoke-test.mjs"
   },
   "repository": {
     "type": "git",
