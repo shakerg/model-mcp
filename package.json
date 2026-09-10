@@ -12,7 +12,8 @@
     "prepare": "npm run build",
     "prepack": "npm run clean && npm run build",
     "validate:manifest": "node scripts/validate-server-json.mjs",
-    "test:package": "npm run check && npm run validate:manifest && node scripts/package-smoke-test.mjs"
+    "test:package": "npm run check && npm run validate:manifest && node scripts/package-smoke-test.mjs",
+    "test:docker": "docker build -t model-mcp:test . && MODEL_MCP_DOCKER_IMAGE=model-mcp:test node scripts/docker-smoke-test.mjs"
   },
   "repository": {
     "type": "git",

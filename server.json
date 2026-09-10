@@ -43,6 +43,56 @@
           "isSecret": false
         }
       ]
+    },
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/shakerg/model-mcp:1.0.1",
+      "version": "1.0.1",
+      "runtimeHint": "docker",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "--rm"
+        },
+        {
+          "type": "named",
+          "name": "-i"
+        },
+        {
+          "type": "named",
+          "name": "--add-host",
+          "value": "host.docker.internal:host-gateway",
+          "description": "Expose model runtimes running on the Docker host."
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "MODEL_MCP_ENDPOINTS",
+          "description": "Comma-separated model endpoint base URLs. Use host.docker.internal for services on the Docker host.",
+          "placeholder": "http://host.docker.internal:11434,http://host.docker.internal:1234,http://host.docker.internal:8080",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "MODEL_MCP_TIMEOUT_MS",
+          "description": "Timeout in milliseconds for each model endpoint request.",
+          "default": "2000",
+          "format": "number",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "MODEL_MCP_ALLOW_REMOTE",
+          "description": "Allow configured model endpoints outside the local machine or Docker host.",
+          "default": "false",
+          "format": "boolean",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
     }
   ]
 }

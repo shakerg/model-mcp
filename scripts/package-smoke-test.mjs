@@ -58,6 +58,8 @@ try {
   assert.equal(packageJson.mcpName, serverJson.name, 'package mcpName differs from server.json name');
   assert.equal(serverJson.packages[0].identifier, packageJson.name, 'server.json npm identifier differs from package name');
   assert.equal(serverJson.packages[0].version, packageJson.version, 'server.json package version differs from package version');
+  assert.equal(serverJson.packages[1].version, packageJson.version, 'server.json container version differs from package version');
+  assert.match(serverJson.packages[1].identifier, new RegExp(`:${packageJson.version.replaceAll('.', '\\.')}$`), 'container tag differs from package version');
   assert.equal(serverJson.version, packageJson.version, 'server.json server version differs from package version');
   await access(binary, constants.R_OK);
   assert((await readFile(binary, 'utf8')).startsWith('#!/usr/bin/env node\n'), 'dist binary is missing its Node.js shebang');
