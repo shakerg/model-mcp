@@ -4,14 +4,22 @@
   "description": "MCP server for discovering and describing local model runtimes",
   "main": "dist/index.js",
   "scripts": {
+    "clean": "node scripts/clean.mjs",
     "build": "tsc",
     "check": "tsc --noEmit",
     "start": "node dist/index.js",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepack": "npm run clean && npm run build",
+    "validate:manifest": "node scripts/validate-server-json.mjs",
+    "test:package": "npm run check && npm run validate:manifest && node scripts/package-smoke-test.mjs"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/shakerg/model-mcp.git"
+  },
+  "homepage": "https://github.com/shakerg/model-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/shakerg/model-mcp/issues"
   },
   "keywords": [
     "mcp",
@@ -29,14 +37,20 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "server.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "zod": "^4.6.1"
   },
   "devDependencies": {
     "@types/node": "^22.20.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "typescript": "^7.0.2"
   }
 }
