@@ -12,8 +12,6 @@ The server does not proxy prompts or model completions. It advertises where loca
 
 ## Install
 
-This repository is ready to be packaged as `model-mcp`, but **the package is not currently published to npm**. Until `npm view model-mcp` succeeds, do not configure Copilot with `npx -y model-mcp`.
-
 ### Run from a source checkout
 
 ```sh
