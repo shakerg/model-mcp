@@ -12,8 +12,6 @@ The server does not proxy prompts or model completions. It advertises where loca
 
 ## Install
 
-Published releases are available on npm as [`model-mcp`](https://www.npmjs.com/package/model-mcp). Confirm the version you want with `npm view model-mcp version` before configuring it. This is a local stdio server, so Node.js 20 or newer must be installed on the machine running GitHub Copilot.
-
 ### Run from a source checkout
 
 ```sh
