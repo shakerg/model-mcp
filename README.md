@@ -12,7 +12,7 @@ The server does not proxy prompts or model completions. It advertises where loca
 
 ## Install
 
-This repository is ready to be packaged as `model-mcp`, but **the package is not currently published to npm**. Until `npm view model-mcp` succeeds, do not configure Copilot with `npx -y model-mcp`.
+The package is published on npm as [`model-mcp`](https://www.npmjs.com/package/model-mcp). This is a local stdio server, so Node.js 20 or newer must be installed on the machine running GitHub Copilot.
 
 ### Run from a source checkout
 
@@ -39,9 +39,9 @@ In the GitHub Copilot app, add a **local/stdio** MCP server. Use the absolute pa
 
 You can also run the checkout directly with `npm start`; it communicates over stdio and normally waits silently for an MCP client.
 
-### Install from npm after publication
+### Install from npm
 
-Once a maintainer has published this package and `npm view model-mcp` returns a version, Copilot can let `npx` download and launch it:
+In the GitHub Copilot app, add a **local/stdio** MCP server and let `npx` download and launch it:
 
 ```json
 {
@@ -56,6 +56,16 @@ Once a maintainer has published this package and `npm view model-mcp` returns a 
 ```
 
 Use the package's exact published version for reproducible installation.
+
+### Install from an MCP registry
+
+After a release is listed in an MCP registry, supported Copilot clients can install it from the registry instead of entering the command manually. The installer reads `server.json` and presents these optional environment fields:
+
+- `MODEL_MCP_ENDPOINTS`
+- `MODEL_MCP_TIMEOUT_MS`
+- `MODEL_MCP_ALLOW_REMOTE`
+
+Leave a field unset to use its default. Registry installation is available only after the matching npm package version and `server.json` entry have both been published.
 
 > [!WARNING]
 > `https://github.com/shakerg/model-mcp` is a repository page, not a remote MCP endpoint. Do not enter it as an HTTP, SSE, or streamable HTTP server URL. This project is a local stdio server; treating the GitHub URL as an MCP endpoint sends protocol requests to a web page and results in HTTP errors such as `422` with an HTML response.
@@ -101,10 +111,10 @@ npm run test:package
 
 ## Publishing checklist
 
-Publication requires maintainer access to npm and is intentionally not performed by this repository:
+Publication requires maintainer access to npm and the MCP registry:
 
 1. Run `npm run test:package`.
-2. Confirm the version matches in `package.json`, `server.json`, and `src/index.ts`.
+2. Confirm the version matches in `package.json`, `server.json`, and `src/index.ts`, and that `package.json#mcpName` matches `server.json#name`.
 3. Publish with the project owner's npm account or configured trusted publishing.
 4. Confirm `npm view model-mcp version` returns the released version.
-5. Only then publish or submit `server.json` to an MCP registry.
+5. Only then publish `server.json` to an MCP registry.
