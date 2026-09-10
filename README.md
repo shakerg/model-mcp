@@ -1,5 +1,8 @@
 # model-mcp
 
+[![npm](https://img.shields.io/npm/v/model-mcp)](https://www.npmjs.com/package/model-mcp)
+[![container](https://img.shields.io/badge/container-ghcr.io-blue)](https://github.com/shakerg/model-mcp/pkgs/container/model-mcp)
+
 `model-mcp` is a Model Context Protocol (MCP) server that discovers local model runtimes and exposes their endpoint metadata to MCP clients such as Copilot.
 
 It checks common localhost endpoints for:
@@ -57,7 +60,7 @@ Use the package's exact published version for reproducible installation.
 
 ### Install from Docker
 
-After the matching image is published to GitHub Container Registry, add a **local/stdio** server that keeps stdin open and maps the cross-platform Docker host name:
+Images are stored in this repository's [GitHub Container Registry package](https://github.com/shakerg/model-mcp/pkgs/container/model-mcp). After the matching version is available, add a **local/stdio** server that keeps stdin open and maps the cross-platform Docker host name:
 
 ```json
 {
@@ -135,6 +138,8 @@ npm run test:docker
 
 `test:docker` builds the production image and completes the same MCP initialize/list-tools exchange through `docker run`.
 
+When Docker-related source changes merge to `main`, the `Publish container` GitHub Actions workflow builds `linux/amd64` and `linux/arm64` images and pushes both the package version and `latest` tags to this repository's GHCR package. The workflow rejects an existing version tag, so image changes require a version bump.
+
 ## Publishing checklist
 
 Publication requires maintainer access to npm, GitHub Container Registry, and the MCP registry:
@@ -143,5 +148,5 @@ Publication requires maintainer access to npm, GitHub Container Registry, and th
 2. Confirm the version matches in `package.json`, `server.json`, and `src/index.ts`, and that `package.json#mcpName` matches `server.json#name`.
 3. Publish with the project owner's npm account or configured trusted publishing.
 4. Confirm `npm view model-mcp version` returns the released version.
-5. Push a matching `v<version>` Git tag to publish the multi-platform image, then make the GHCR package public and verify its version tag.
+5. Merge the release PR to `main` to publish the multi-platform image, then make the GHCR package public if it does not inherit public visibility and verify its version tag.
 6. Only then publish `server.json` to an MCP registry.
